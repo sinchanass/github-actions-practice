@@ -1,9 +1,19 @@
 name: Lint, Test & Deploy
 
-on: push
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, closed]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   lint:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) ||
+      (github.event_name == 'pull_request_review' && github.event.review.state == 'approved')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
